@@ -21,6 +21,15 @@ jobs:
       - name: Install Proselint
         run: pip install proselint
 
-      - name: Run Proselint
-        run: proselint '**/*.md'
+      - name: List Changed Markdown Files
+        id: changed_files
+        run: |
+          echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.md$')"
+
+      - name: Run Proselint on Changed Files
+        run: |
+          for file in ${{ steps.changed_files.outputs.files }}; do
+            proselint "$file"
+          done
+
 
